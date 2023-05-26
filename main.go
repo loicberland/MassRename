@@ -43,22 +43,25 @@ func main() {
 func findAndReplaceString(dirPath, searchString, replaceString string) {
 	files, errFiles := os.ReadDir(dirPath)
 	countRename := 0
+	dir, _ := os.Executable()
+	exeName := filepath.Base(dir)
 	//Vérification path correct
 	if errFiles != nil {
 		log.Fatal(errFiles)
 	}
 	for _, file := range files {
-
-		if strings.Contains(file.Name(), searchString) {
-			newName := strings.ReplaceAll(file.Name(), searchString, replaceString)
-			oldPath := filepath.Join(dirPath, file.Name())
-			newPath := filepath.Join(dirPath, newName)
-			errRename := os.Rename(oldPath, newPath)
-			if errRename != nil {
-				log.Fatal(errRename)
+		if file.Name() != exeName {
+			if strings.Contains(file.Name(), searchString) {
+				newName := strings.ReplaceAll(file.Name(), searchString, replaceString)
+				oldPath := filepath.Join(dirPath, file.Name())
+				newPath := filepath.Join(dirPath, newName)
+				errRename := os.Rename(oldPath, newPath)
+				if errRename != nil {
+					log.Fatal(errRename)
+				}
+				fmt.Println("**", file.Name(), "remoner en", newName)
+				countRename++
 			}
-			fmt.Println("**", file.Name(), "remoner en", newName)
-			countRename++
 		}
 	}
 	if countRename > 1 {
