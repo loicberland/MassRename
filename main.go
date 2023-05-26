@@ -10,19 +10,22 @@ import (
 )
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	scanner := bufio.NewScanner(reader)
-	// Demander chemin
-	//	- Si pas de chemin rechercher dans dossier actuel
-	fmt.Print("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
-	scanner.Scan()
-	dirPath := scanner.Text()
-	fmt.Print("Rechercher : ")
-	scanner.Scan()
-	inputSearch := scanner.Text()
-	fmt.Print("Remplacer par : ")
-	scanner.Scan()
-	inputReplace := scanner.Text()
+	dirPath := askValue("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
+	inputSearch := askValue("Rechercher : ")
+	inputReplace := askValue("Remplacer par : ")
+	// reader := bufio.NewReader(os.Stdin)
+	// scanner := bufio.NewScanner(reader)
+	// // Demander chemin
+	// //	- Si pas de chemin rechercher dans dossier actuel
+	// fmt.Print("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
+	// scanner.Scan()
+	// dirPath := scanner.Text()
+	// fmt.Print("Rechercher : ")
+	// scanner.Scan()
+	// inputSearch := scanner.Text()
+	// fmt.Print("Remplacer par : ")
+	// scanner.Scan()
+	// inputReplace := scanner.Text()
 	if dirPath == "" {
 		// _, dir, _, _ := runtime.Caller(0) //Mode débug
 		dir, err := os.Executable() //Mode Prod
@@ -40,6 +43,13 @@ func main() {
 
 }
 
+func askValue(question string) string {
+	reader := bufio.NewReader(os.Stdin)
+	scanner := bufio.NewScanner(reader)
+	fmt.Print(question)
+	scanner.Scan()
+	return scanner.Text()
+}
 func findAndReplaceString(dirPath, searchString, replaceString string) {
 	files, errFiles := os.ReadDir(dirPath)
 	countRename := 0
@@ -59,7 +69,7 @@ func findAndReplaceString(dirPath, searchString, replaceString string) {
 				if errRename != nil {
 					log.Fatal(errRename)
 				}
-				fmt.Println("**", file.Name(), "remoner en", newName)
+				fmt.Println("**", file.Name(), " ==> ", newName)
 				countRename++
 			}
 		}
@@ -73,7 +83,7 @@ func findAndReplaceString(dirPath, searchString, replaceString string) {
 	}
 }
 
-// *********** fonction pour déterminer s'il s'agis d'une dossier ou non
+// *********** fonction pour déterminer s'il s'agit d'un dossier ou non
 //	************  Voir plus tard si utile
 // func isDirectory(path string) bool {
 // 	fileInfo, err := os.Stat(path)
