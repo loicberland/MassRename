@@ -18,14 +18,13 @@ func main() {
 	- Recherche les dossiers, les fichiers, les sous-dossiers et les sous-fichiers => 4 :`
 	for {
 		restartChoice = ""
-		dirPath := askValue("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
-		inputSearch := askValue("Rechercher : ")
-		inputReplace := askValue("Remplacer par : ")
 		optionChoice := askValue(optionText)
 		for checkOptionChoice(optionChoice) == false {
 			optionChoice = askValue(optionText)
 		}
-		fmt.Println(optionChoice)
+		dirPath := askValue("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
+		inputSearch := askValue("Rechercher : ")
+		inputReplace := askValue("Remplacer par : ")
 		if dirPath == "" {
 			// _, dir, _, _ := runtime.Caller(0) //Mode débug
 			dir, err := os.Executable() //Mode Prod
@@ -36,7 +35,7 @@ func main() {
 			dirPath = filepath.Dir(dir)
 		}
 		fmt.Println("Path :", dirPath)
-		findAndReplaceString(dirPath, inputSearch, inputReplace)
+		findAndReplaceString(dirPath, inputSearch, inputReplace, optionChoice)
 
 		fmt.Println(`Appuyez sur "y" pour relancer le programme ou Entrer pour le quitter`)
 		fmt.Scanln(&restartChoice)
@@ -72,7 +71,7 @@ func askValue(question string) string {
 	scanner.Scan()
 	return scanner.Text()
 }
-func findAndReplaceString(dirPath, searchString, replaceString string) {
+func findAndReplaceString(dirPath, searchString, replaceString, option string) {
 	files, errFiles := os.ReadDir(dirPath)
 	countRename := 0
 	//On récupère le nom de l'exe
@@ -83,10 +82,15 @@ func findAndReplaceString(dirPath, searchString, replaceString string) {
 		log.Fatal(errFiles)
 	}
 	for _, file := range files {
-		if file.Name() != exeName { //Sécuritée pour le pas renommer l'exe
+		if file.Name() != exeName { //Sécuritée pour pas renommer l'exe
+			oldPath := filepath.Join(dirPath, file.Name())
+			if isDirectory(oldPath) {
+				if option == "3" {
+					continue
+				}
+			}
 			if strings.Contains(file.Name(), searchString) {
 				newName := strings.ReplaceAll(file.Name(), searchString, replaceString)
-				oldPath := filepath.Join(dirPath, file.Name())
 				newPath := filepath.Join(dirPath, newName)
 				errRename := os.Rename(oldPath, newPath)
 				if errRename != nil {
@@ -107,15 +111,16 @@ func findAndReplaceString(dirPath, searchString, replaceString string) {
 }
 
 // *********** fonction pour déterminer s'il s'agit d'un dossier ou non
+//
 //	************  Voir plus tard si utile
-// func isDirectory(path string) bool {
-// 	fileInfo, err := os.Stat(path)
-// 	if err != nil {
-// 		return false
-// 	}
+func isDirectory(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
 
-// 	return fileInfo.IsDir()
-// }
+	return fileInfo.IsDir()
+}
 
 //Test appel de la fonction isDirectory
 // if isDirectory(filepath.Join(dirPath, file.Name())) {
