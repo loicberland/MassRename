@@ -10,34 +10,40 @@ import (
 )
 
 func main() {
+	var restartChoice string
 	optionText := `Options :
 	- Recherche les dossiers et fichiers => 1 (default) 
 	- Recherche seulement les dossiers => 2 
 	- Recherche seulement les fichiers => 3 
 	- Recherche les dossiers, les fichiers, les sous-dossiers et les sous-fichiers => 4 :`
-
-	dirPath := askValue("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
-	inputSearch := askValue("Rechercher : ")
-	inputReplace := askValue("Remplacer par : ")
-	optionChoice := askValue(optionText)
-	for checkOptionChoice(optionChoice) == false {
-		optionChoice = askValue(optionText)
-	}
-	fmt.Println(optionChoice)
-	if dirPath == "" {
-		// _, dir, _, _ := runtime.Caller(0) //Mode débug
-		dir, err := os.Executable() //Mode Prod
-		if err != nil {
-			fmt.Println("Erreur lors de la récupération du chemin de l'exécutable :", err)
-			return
+	for {
+		restartChoice = ""
+		dirPath := askValue("Path du dossier à scanner (si vide on prend le path de l'exe) : ")
+		inputSearch := askValue("Rechercher : ")
+		inputReplace := askValue("Remplacer par : ")
+		optionChoice := askValue(optionText)
+		for checkOptionChoice(optionChoice) == false {
+			optionChoice = askValue(optionText)
 		}
-		dirPath = filepath.Dir(dir)
-	}
-	fmt.Println("Path :", dirPath)
-	findAndReplaceString(dirPath, inputSearch, inputReplace)
+		fmt.Println(optionChoice)
+		if dirPath == "" {
+			// _, dir, _, _ := runtime.Caller(0) //Mode débug
+			dir, err := os.Executable() //Mode Prod
+			if err != nil {
+				fmt.Println("Erreur lors de la récupération du chemin de l'exécutable :", err)
+				return
+			}
+			dirPath = filepath.Dir(dir)
+		}
+		fmt.Println("Path :", dirPath)
+		findAndReplaceString(dirPath, inputSearch, inputReplace)
 
-	fmt.Println("Appuyez sur Entrée pour quitter le programme...")
-	fmt.Scanln()
+		fmt.Println(`Appuyez sur "y" pour relancer le programme ou Entrer pour le quitter`)
+		fmt.Scanln(&restartChoice)
+		if strings.ToLower(restartChoice) != "y" {
+			break
+		}
+	}
 
 }
 func checkOptionChoice(optionChoice string) bool {
