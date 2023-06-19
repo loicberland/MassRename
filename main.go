@@ -34,7 +34,7 @@ func main() {
 			}
 			dirPath = filepath.Dir(dir)
 		}
-		fmt.Println("Path :", dirPath)
+		// fmt.Println("Path :", dirPath)
 		findAndReplaceString(dirPath, inputSearch, inputReplace, optionChoice)
 
 		fmt.Println(`Appuyez sur "y" pour relancer le programme ou Entrer pour le quitter`)
@@ -111,8 +111,6 @@ func findAndReplaceString(dirPath, searchString, replaceString, option string) {
 }
 
 // *********** fonction pour déterminer s'il s'agit d'un dossier ou non
-//
-//	************  Voir plus tard si utile
 func isDirectory(path string) bool {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
@@ -121,12 +119,3 @@ func isDirectory(path string) bool {
 
 	return fileInfo.IsDir()
 }
-
-//Test appel de la fonction isDirectory
-// if isDirectory(filepath.Join(dirPath, file.Name())) {
-// 	fmt.Printf("dossier \n")
-// } else {
-// 	fmt.Printf("pas dossier \n")
-// }
-
-// ***********
